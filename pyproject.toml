@@ -3,6 +3,7 @@ name = "job-seeker"
 version = "0.1.0"
 description = "Job Scraper - Search remote jobs across multiple ATS platforms"
 authors = [
+    {name = "Marcelo Andriolli", email = "marcelorsa@gmail.com"},
     {name = "Davi Oliveira", email = "davioliveira353.do@gmail.com"},
 ]
 readme = "README.md"
