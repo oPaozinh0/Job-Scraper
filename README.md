@@ -454,7 +454,7 @@ This project is provided as-is for educational and development purposes.
 - **Original Project**: [Marcelo Andriolli](https://github.com/marceloandriolli) - [Gist: Job Scraper](https://gist.github.com/marceloandriolli/d098fc65546c722394cd546b06687489)
 - **Refactoring and Extension**: [Davi Oliveira](https://github.com/oPaozinh0)
 
-The original PHP-based scraper has been refactored and significantly extended with:
+The original based scraper has been refactored and significantly extended with:
 - Python/Flask backend with REST API
 - Multi-technology and multi-seniority support
 - Real-time web dashboard with SSE streaming
