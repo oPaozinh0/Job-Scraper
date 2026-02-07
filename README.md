@@ -390,14 +390,12 @@ Create a `.env` file in the project root:
 
 ```env
 SERPAPI_API_KEY_1=your_serper_api_key_here
-GOOGLE_API_KEY_1=your_google_api_key_here
-GOOGLE_SEARCH_ENGINE_ID_1=your_search_engine_id_here
 ```
 
 ### Serper API
 
 - Sign up at [https://serper.dev](https://serper.dev)
-- Free tier provides 2,420 requests per month
+- Free tier provides 2500 requests per month
 - This project uses approximately 80 requests per run
 - Supports up to 26 runs per month on the free tier
 
@@ -453,8 +451,8 @@ This project is provided as-is for educational and development purposes.
 
 ## Credits
 
-- **Original Project**: [Marcelo Andriolli](https://github.com/marceloandriolli) - [Gist: Job Scraper in PHP](https://gist.github.com/marceloandriolli/d098fc65546c722394cd546b06687489)
-- **Refactoring and Extension**: Davi Oliveira
+- **Original Project**: [Marcelo Andriolli](https://github.com/marceloandriolli) - [Gist: Job Scraper](https://gist.github.com/marceloandriolli/d098fc65546c722394cd546b06687489)
+- **Refactoring and Extension**: [Davi Oliveira](https://github.com/oPaozinh0)
 
 The original PHP-based scraper has been refactored and significantly extended with:
 - Python/Flask backend with REST API
