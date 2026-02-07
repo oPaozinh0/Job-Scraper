@@ -1,0 +1,32 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# CSV data files
+*.csv
+
+# IDE
+.vscode/
+.idea/
+
+# Poetry
+poetry.lock
+
+# OpenCode
+.opencode/
+opencode.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (in case)
+node_modules/

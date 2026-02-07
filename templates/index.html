@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Scraper Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1117;
+        --card: #1a1d27;
+        --accent: #6366f1;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --border: #2a2f3b;
+        --danger: #ef4444;
+        --success: #22c55e;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 20px 60px;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .header-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      h1 {
+        font-size: clamp(28px, 3vw, 36px);
+        font-weight: 700;
+      }
+
+      .subtitle {
+        font-size: 16px;
+        color: var(--muted);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(99, 102, 241, 0.15);
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        color: var(--text);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .filters {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .search-wrapper {
+        position: relative;
+      }
+
+      .search-wrapper input {
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 14px 16px 14px 44px;
+        border-radius: 12px;
+        font-size: 14px;
+        outline: none;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .search-wrapper input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 16px;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: var(--muted);
+      }
+
+      .origin-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .filter-controls {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .filter-group label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+      }
+
+      .filter-select {
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        cursor: pointer;
+        outline: none;
+        min-width: 160px;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+      }
+
+      .filter-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+
+      .filter-select:hover {
+        border-color: var(--accent);
+      }
+
+      .origin-button {
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .origin-button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .origin-button.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
+      }
+
+      .jobs-grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .job-card {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 220px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+      }
+
+      .job-card:hover {
+        transform: scale(1.01);
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 18px 40px rgba(15, 17, 23, 0.45);
+      }
+
+      .origin-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #0f1117;
+      }
+
+      .job-title {
+        font-size: 18px;
+        font-weight: 600;
+        padding-right: 70px;
+      }
+
+      .job-snippet {
+        font-size: 13px;
+        color: var(--muted);
+        flex: 1;
+      }
+
+      .job-link {
+        font-size: 12px;
+        word-break: break-all;
+        color: var(--accent);
+      }
+
+      .job-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--text);
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .state-message {
+        text-align: center;
+        color: var(--muted);
+        margin-top: 30px;
+        font-size: 15px;
+      }
+
+      .skeleton {
+        background: linear-gradient(90deg, rgba(26, 29, 39, 0.8), rgba(40, 45, 60, 0.8), rgba(26, 29, 39, 0.8));
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 12px;
+        height: 220px;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 17, 23, 0.78);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(8px);
+        z-index: 50;
+        animation: fadeIn 0.2s ease;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        max-width: 900px;
+        width: 100%;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .modal-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .modal-close {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font-size: 22px;
+        cursor: pointer;
+      }
+
+      .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .modal-body h1,
+      .modal-body h2,
+      .modal-body h3,
+      .modal-body h4 {
+        margin: 18px 0 10px;
+        font-weight: 600;
+      }
+
+      .modal-body p {
+        margin-bottom: 12px;
+        color: var(--text);
+      }
+
+      .modal-body ul {
+        padding-left: 20px;
+        margin-bottom: 12px;
+      }
+
+      .modal-body li {
+        margin-bottom: 6px;
+      }
+
+      .modal-body a {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+
+      .modal-body pre {
+        white-space: pre-wrap;
+        font-family: "Inter", system-ui, sans-serif;
+        color: var(--text);
+      }
+
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 3px solid rgba(99, 102, 241, 0.2);
+        border-top-color: var(--accent);
+        animation: spin 0.8s linear infinite;
+        margin: 40px auto;
+      }
+
+      /* Fetch Jobs Button */
+      .btn-fetch {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-fetch:hover:not(:disabled) {
+        box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
+        transform: translateY(-1px);
+      }
+
+      .btn-fetch:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .btn-fetch .btn-spinner {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+        display: none;
+      }
+
+      .btn-fetch.loading .btn-spinner {
+        display: inline-block;
+      }
+
+      .btn-fetch.loading .btn-icon {
+        display: none;
+      }
+
+      /* Fetch Progress Panel */
+      .fetch-progress {
+        display: none;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 24px;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .fetch-progress.active {
+        display: block;
+      }
+
+      .fetch-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .fetch-progress-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .fetch-progress-count {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .progress-bar-container {
+        background: var(--bg);
+        border-radius: 999px;
+        height: 8px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        border-radius: 999px;
+        transition: width 0.5s ease;
+        width: 0%;
+      }
+
+      .fetch-progress-log {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .ats-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        transition: all 0.3s ease;
+      }
+
+      .ats-status.in-progress {
+        border-color: #f59e0b;
+        color: #f59e0b;
+      }
+
+      .ats-status.done {
+        border-color: #22c55e;
+        color: #22c55e;
+      }
+
+      .ats-status.error {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      .fetch-complete-banner {
+        display: none;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        color: #22c55e;
+        padding: 12px 20px;
+        border-radius: 12px;
+        margin-top: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .fetch-complete-banner.active {
+        display: block;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #131722;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #2f3545;
+        border-radius: 999px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #3c4358;
+      }
+
+      @media (max-width: 768px) {
+        .header-top {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .filter-controls {
+          width: 100%;
+        }
+
+        .filter-select {
+          min-width: 0;
+          flex: 1;
+        }
+
+        .origin-badge {
+          position: static;
+          align-self: flex-start;
+        }
+
+        .job-title {
+          padding-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-top">
+          <div>
+            <h1>Job Scraper Dashboard</h1>
+            <p class="subtitle" id="subtitleText">Remote Positions - LATAM &amp; Global</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="filter-controls">
+              <div class="filter-group">
+                <label for="techSelect">Technology</label>
+                <select id="techSelect" class="filter-select">
+                  <option value="php">Loading...</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="levelSelect">Seniority</label>
+                <select id="levelSelect" class="filter-select">
+                  <option value="any">Loading...</option>
+                </select>
+              </div>
+            </div>
+            <button
+              class="btn-fetch"
+              id="fetchJobsBtn"
+              title="Search all 9 ATS platforms for new jobs"
+            >
+              <span class="btn-icon">🔄</span>
+              <span class="btn-spinner"></span>
+              <span class="btn-text">Fetch New Jobs</span>
+            </button>
+            <div class="badge" id="dataBadge">Loading...</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="fetch-progress" id="fetchProgress">
+        <div class="fetch-progress-header">
+          <div class="fetch-progress-title">Fetching Jobs from ATS Platforms...</div>
+          <div class="fetch-progress-count" id="fetchProgressCount">0 / 9 platforms</div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="fetchProgressBar"></div>
+        </div>
+        <div class="fetch-progress-log" id="fetchProgressLog" aria-live="polite"></div>
+        <div class="fetch-complete-banner" id="fetchCompleteBanner"></div>
+      </div>
+
+      <section class="filters">
+        <div class="search-wrapper">
+          <svg
+            class="search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m21 21-4.35-4.35m1.85-5.4a7.25 7.25 0 1 1-14.5 0 7.25 7.25 0 0 1 14.5 0Z"
+            />
+          </svg>
+          <input id="searchInput" type="text" placeholder="Search jobs by title..." aria-label="Search jobs by title" />
+        </div>
+        <div class="origin-buttons" id="originButtons"></div>
+      </section>
+
+      <section>
+        <div class="jobs-grid" id="jobsGrid"></div>
+        <div class="state-message" id="stateMessage"></div>
+      </section>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <div class="modal-title" id="modalTitle">Scrape Details</div>
+          <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+
+    <script>
+      const originColors = {
+        Greenhouse: "#22c55e",
+        Lever: "#3b82f6",
+        AshBy: "#f59e0b",
+        Workable: "#ef4444",
+        Breezy: "#8b5cf6",
+        "Jazz CO": "#ec4899",
+        "Smart Recruiters": "#14b8a6",
+        ICIMS: "#f97316",
+        PinpointHQ: "#06b6d4",
+        Other: "#6b7280",
+      };
+
+      let currentOrigin = "";
+      let currentSearch = "";
+      let debounceTimer = null;
+
+      const originButtonsEl = document.getElementById("originButtons");
+      const jobsGridEl = document.getElementById("jobsGrid");
+      const stateMessageEl = document.getElementById("stateMessage");
+      const dataBadgeEl = document.getElementById("dataBadge");
+      const searchInputEl = document.getElementById("searchInput");
+      const modalOverlayEl = document.getElementById("modalOverlay");
+      const modalBodyEl = document.getElementById("modalBody");
+      const modalCloseEl = document.getElementById("modalClose");
+      const techSelectEl = document.getElementById("techSelect");
+      const levelSelectEl = document.getElementById("levelSelect");
+      const subtitleEl = document.getElementById("subtitleText");
+
+      // ---- Fetch Jobs SSE ----
+      const fetchJobsBtnEl = document.getElementById("fetchJobsBtn");
+      const fetchProgressEl = document.getElementById("fetchProgress");
+      const fetchProgressCountEl = document.getElementById("fetchProgressCount");
+      const fetchProgressBarEl = document.getElementById("fetchProgressBar");
+      const fetchProgressLogEl = document.getElementById("fetchProgressLog");
+      const fetchCompleteBannerEl = document.getElementById("fetchCompleteBanner");
+
+      let isFetching = false;
+
+      const startFetchJobs = () => {
+        if (isFetching) return;
+        isFetching = true;
+
+        // Reset UI
+        fetchJobsBtnEl.classList.add("loading");
+        fetchJobsBtnEl.disabled = true;
+        fetchJobsBtnEl.querySelector(".btn-text").textContent = "Fetching...";
+        fetchProgressEl.classList.add("active");
+        fetchProgressCountEl.textContent = "0 / 9 platforms";
+        fetchProgressBarEl.style.width = "0%";
+        fetchProgressLogEl.innerHTML = "";
+        fetchCompleteBannerEl.classList.remove("active");
+        fetchCompleteBannerEl.textContent = "";
+
+        // First reset any previous scrape state, then start the scrape
+        fetch("/api/fetch-jobs/reset", { method: "POST" })
+          .then(() =>
+            fetch("/api/fetch-jobs", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                technology: techSelectEl.value,
+                level: levelSelectEl.value,
+              }),
+            })
+          )
+          .then((res) => {
+            if (!res.ok && res.status === 409) {
+              throw new Error("A scrape is already running. Please wait.");
+            }
+            if (!res.ok) {
+              throw new Error("Failed to start scrape");
+            }
+            const evtSource = new EventSource("/api/fetch-jobs/stream");
+            let completedCount = 0;
+            const totalPlatforms = 9;
+
+            evtSource.onmessage = (event) => {
+              try {
+                const data = JSON.parse(event.data);
+
+                if (data.event === "ats_start") {
+                  // Add or update ATS status chip
+                  let chip = document.getElementById(
+                    `ats-${data.origin.replace(/\s+/g, "-")}`
+                  );
+                  if (!chip) {
+                    chip = document.createElement("span");
+                    chip.id = `ats-${data.origin.replace(/\s+/g, "-")}`;
+                    chip.className = "ats-status in-progress";
+                    fetchProgressLogEl.appendChild(chip);
+                  } else {
+                    chip.className = "ats-status in-progress";
+                  }
+                  chip.textContent = `⏳ ${data.origin}...`;
+                }
+
+                if (data.event === "page_fetched") {
+                  const chip = document.getElementById(
+                    `ats-${data.origin.replace(/\s+/g, "-")}`
+                  );
+                  if (chip) {
+                    chip.textContent = `⏳ ${data.origin} (p${data.page}: +${data.results})`;
+                  }
+                }
+
+                if (data.event === "ats_complete") {
+                  completedCount++;
+                  const chip = document.getElementById(
+                    `ats-${data.origin.replace(/\s+/g, "-")}`
+                  );
+                  if (chip) {
+                    chip.className = "ats-status done";
+                    chip.textContent = `✅ ${data.origin} (${data.count})`;
+                  }
+                  const pct = Math.round((completedCount / totalPlatforms) * 100);
+                  fetchProgressBarEl.style.width = `${pct}%`;
+                  fetchProgressCountEl.textContent = `${completedCount} / ${totalPlatforms} platforms`;
+                }
+
+                if (data.event === "error" && data.origin) {
+                  const chip = document.getElementById(
+                    `ats-${data.origin.replace(/\s+/g, "-")}`
+                  );
+                  if (chip) {
+                    chip.className = "ats-status error";
+                    chip.textContent = `❌ ${data.origin}`;
+                  }
+                }
+
+                if (data.event === "complete") {
+                  evtSource.close();
+                  isFetching = false;
+                  fetchJobsBtnEl.classList.remove("loading");
+                  fetchJobsBtnEl.disabled = false;
+                  fetchJobsBtnEl.querySelector(".btn-text").textContent = "Fetch New Jobs";
+                  fetchProgressBarEl.style.width = "100%";
+                  fetchProgressCountEl.textContent = `${totalPlatforms} / ${totalPlatforms} platforms`;
+                  fetchCompleteBannerEl.textContent = `✅ Done! Found ${data.total_jobs} jobs. Saved to ${data.file}`;
+                  fetchCompleteBannerEl.classList.add("active");
+
+                  // Reload dashboard data
+                  setTimeout(() => {
+                    loadOrigins();
+                    loadJobs(currentOrigin, currentSearch);
+                  }, 500);
+                }
+
+                if (data.event === "error" && !data.origin) {
+                  evtSource.close();
+                  isFetching = false;
+                  fetchJobsBtnEl.classList.remove("loading");
+                  fetchJobsBtnEl.disabled = false;
+                  fetchJobsBtnEl.querySelector(".btn-text").textContent = "Fetch New Jobs";
+                  fetchCompleteBannerEl.textContent = `❌ Error: ${data.message || "Unknown error"}`;
+                  fetchCompleteBannerEl.style.borderColor = "rgba(239,68,68,0.3)";
+                  fetchCompleteBannerEl.style.background = "rgba(239,68,68,0.1)";
+                  fetchCompleteBannerEl.style.color = "#ef4444";
+                  fetchCompleteBannerEl.classList.add("active");
+                }
+              } catch (err) {
+                console.error("SSE parse error:", err);
+              }
+            };
+
+            evtSource.onerror = () => {
+              evtSource.close();
+              if (isFetching) {
+                isFetching = false;
+                fetchJobsBtnEl.classList.remove("loading");
+                fetchJobsBtnEl.disabled = false;
+                fetchJobsBtnEl.querySelector(".btn-text").textContent = "Fetch New Jobs";
+                fetchCompleteBannerEl.textContent = "❌ Connection lost. Check server logs.";
+                fetchCompleteBannerEl.style.borderColor = "rgba(239,68,68,0.3)";
+                fetchCompleteBannerEl.style.background = "rgba(239,68,68,0.1)";
+                fetchCompleteBannerEl.style.color = "#ef4444";
+                fetchCompleteBannerEl.classList.add("active");
+              }
+            };
+          })
+          .catch((err) => {
+            console.error("Failed to reset scrape state:", err);
+            isFetching = false;
+            fetchJobsBtnEl.classList.remove("loading");
+            fetchJobsBtnEl.disabled = false;
+            fetchJobsBtnEl.querySelector(".btn-text").textContent = "Fetch New Jobs";
+          });
+      };
+
+      fetchJobsBtnEl.addEventListener("click", startFetchJobs);
+
+      const escapeHtml = (value) =>
+        value
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+
+      const loadTechnologies = async () => {
+        try {
+          const response = await fetch("/api/technologies");
+          if (!response.ok) {
+            throw new Error("Failed to load technologies");
+          }
+          const data = await response.json();
+          techSelectEl.innerHTML = data.technologies
+            .map((t) => `<option value="${t.key}">${escapeHtml(t.label)}</option>`)
+            .join("");
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      const loadLevels = async () => {
+        try {
+          const response = await fetch("/api/levels");
+          if (!response.ok) {
+            throw new Error("Failed to load levels");
+          }
+          const data = await response.json();
+          levelSelectEl.innerHTML = data.levels
+            .map((l) => `<option value="${l.key}">${escapeHtml(l.label)}</option>`)
+            .join("");
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      const updateSubtitle = () => {
+        const techLabel = techSelectEl.options[techSelectEl.selectedIndex]?.text || "PHP";
+        const levelLabel =
+          levelSelectEl.options[levelSelectEl.selectedIndex]?.text || "Any Level";
+        const levelPart = levelLabel === "Any Level" ? "" : ` ${levelLabel}`;
+        subtitleEl.textContent = `${techLabel}${levelPart} Remote Positions - LATAM & Global`;
+      };
+
+      const debounce = (callback, delay) => {
+        return (...args) => {
+          if (debounceTimer) {
+            window.clearTimeout(debounceTimer);
+          }
+          debounceTimer = window.setTimeout(() => callback(...args), delay);
+        };
+      };
+
+      const showLoading = () => {
+        jobsGridEl.innerHTML = Array.from({ length: 6 })
+          .map(() => '<div class="skeleton"></div>')
+          .join("");
+        stateMessageEl.textContent = "";
+      };
+
+      const showMessage = (message) => {
+        jobsGridEl.innerHTML = "";
+        stateMessageEl.textContent = message;
+      };
+
+      const loadOrigins = async () => {
+        originButtonsEl.innerHTML = "";
+        try {
+          const response = await fetch("/api/origins");
+          if (!response.ok) {
+            throw new Error("Failed to load origins");
+          }
+          const data = await response.json();
+          const origins = data.origins || [];
+
+          const allButton = document.createElement("button");
+          allButton.className = "origin-button active";
+          allButton.textContent = "All";
+          allButton.addEventListener("click", () => {
+            currentOrigin = "";
+            setActiveOrigin(allButton);
+            loadJobs(currentOrigin, currentSearch);
+          });
+          originButtonsEl.appendChild(allButton);
+
+          origins.forEach((origin) => {
+            const button = document.createElement("button");
+            button.className = "origin-button";
+            button.textContent = `${origin.name} (${origin.count})`;
+            button.addEventListener("click", () => {
+              currentOrigin = origin.name;
+              setActiveOrigin(button);
+              loadJobs(currentOrigin, currentSearch);
+            });
+            originButtonsEl.appendChild(button);
+          });
+        } catch (error) {
+          console.error(error);
+          showMessage("Unable to load origins. Please try again later.");
+        }
+      };
+
+      const setActiveOrigin = (activeButton) => {
+        const buttons = originButtonsEl.querySelectorAll(".origin-button");
+        buttons.forEach((button) => button.classList.remove("active"));
+        activeButton.classList.add("active");
+      };
+
+      const loadJobs = async (origin = "", search = "") => {
+        showLoading();
+        try {
+          const params = new URLSearchParams();
+          if (origin) {
+            params.append("origin", origin);
+          }
+          if (search) {
+            params.append("search", search);
+          }
+          const queryString = params.toString();
+          const response = await fetch(`/api/jobs${queryString ? `?${queryString}` : ""}`);
+
+          if (!response.ok) {
+            throw new Error("Failed to load jobs");
+          }
+          const data = await response.json();
+          const jobs = data.jobs || [];
+          updateBadge(data.total, data.file);
+          renderJobs(jobs);
+        } catch (error) {
+          console.error(error);
+          showMessage("Unable to load jobs. Please check your connection and try again.");
+        }
+      };
+
+      const updateBadge = (total, file) => {
+        const totalText = typeof total === "number" ? `${total} jobs` : "-- jobs";
+        const fileText = file ? ` | ${file}` : "";
+        dataBadgeEl.textContent = `${totalText}${fileText}`;
+      };
+
+      const renderJobs = (jobs) => {
+        if (!jobs.length) {
+          showMessage("No jobs found");
+          return;
+        }
+        stateMessageEl.textContent = "";
+        jobsGridEl.innerHTML = jobs
+          .map((job) => {
+            const color = originColors[job.origin] || originColors.Other;
+            return `
+            <article class="job-card">
+              <span class="origin-badge" style="background:${color}">${escapeHtml(
+                job.origin || "Other"
+              )}</span>
+              <h3 class="job-title">${escapeHtml(job.title || "Untitled role")}</h3>
+              <p class="job-snippet">${escapeHtml(job.snippet || "")}</p>
+              <a class="job-link" href="${escapeHtml(job.link || "#")}" target="_blank" rel="noreferrer">
+                ${escapeHtml(job.link || "")}
+              </a>
+              <div class="job-actions">
+                <button class="btn btn-primary" data-action="scrape" data-url="${escapeHtml(
+                  job.link || ""
+                )}">
+                  <span>🔍</span>
+                  Scrape Details
+                </button>
+                <button class="btn btn-secondary" data-action="open" data-url="${escapeHtml(
+                  job.link || ""
+                )}">
+                  Open Link
+                </button>
+              </div>
+            </article>
+          `;
+          })
+          .join("");
+      };
+
+      const renderMarkdown = (text) => {
+        let output = escapeHtml(text);
+
+        output = output.replace(/^#### (.*$)/gim, "<h4>$1</h4>");
+        output = output.replace(/^### (.*$)/gim, "<h3>$1</h3>");
+        output = output.replace(/^## (.*$)/gim, "<h2>$1</h2>");
+        output = output.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+        output = output.replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>");
+        output = output.replace(/\*(.*?)\*/gim, "<em>$1</em>");
+        output = output.replace(/\[(.*?)\]\((https?:\/\/.*?)\)/gim, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+        output = output.replace(/^\s*[-*+] (.*$)/gim, "<li>$1</li>");
+        output = output.replace(/(<li>.*<\/li>)/gim, "<ul>$1</ul>");
+
+        output = output
+          .split(/\n{2,}/)
+          .map((block) => {
+            if (block.startsWith("<h") || block.startsWith("<ul")) {
+              return block;
+            }
+            return `<p>${block.replace(/\n/g, "<br />")}</p>`;
+          })
+          .join("");
+
+        return output;
+      };
+
+      const openModal = (content) => {
+        modalBodyEl.innerHTML = content;
+        modalOverlayEl.classList.add("active");
+      };
+
+      const closeModal = () => {
+        modalOverlayEl.classList.remove("active");
+        modalBodyEl.innerHTML = "";
+      };
+
+      const scrapeJob = async (url) => {
+        if (!url) {
+          openModal("<p>Invalid job link provided.</p>");
+          return;
+        }
+        openModal('<div class="spinner"></div>');
+        try {
+          const response = await fetch("/api/scrape", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }),
+          });
+          if (!response.ok) {
+            throw new Error("Scrape failed");
+          }
+          const data = await response.json();
+          if (data.markdown) {
+            openModal(renderMarkdown(data.markdown));
+          } else if (data.text) {
+            openModal(`<pre>${escapeHtml(data.text)}</pre>`);
+          } else {
+            openModal("<p>No content returned for this job.</p>");
+          }
+        } catch (error) {
+          console.error(error);
+          openModal(
+            "<p>Unable to scrape this job right now. Please try again in a few minutes.</p>"
+          );
+        }
+      };
+
+      jobsGridEl.addEventListener("click", (event) => {
+        const target = event.target.closest("button");
+        if (!target) return;
+        const action = target.getAttribute("data-action");
+        const url = target.getAttribute("data-url");
+        if (action === "scrape") {
+          scrapeJob(url);
+        } else if (action === "open") {
+          if (url) {
+            window.open(url, "_blank", "noopener");
+          }
+        }
+      });
+
+      modalCloseEl.addEventListener("click", closeModal);
+      modalOverlayEl.addEventListener("click", (event) => {
+        if (event.target === modalOverlayEl) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modalOverlayEl.classList.contains("active")) {
+          closeModal();
+        }
+      });
+
+      searchInputEl.addEventListener(
+        "input",
+        debounce((event) => {
+          currentSearch = event.target.value.trim();
+          loadJobs(currentOrigin, currentSearch);
+        }, 300)
+      );
+
+      techSelectEl.addEventListener("change", () => {
+        updateSubtitle();
+        fetchJobsBtnEl.title = `Search all 9 ATS platforms for ${
+          techSelectEl.options[techSelectEl.selectedIndex]?.text || ""
+        } jobs`;
+      });
+
+      levelSelectEl.addEventListener("change", () => {
+        updateSubtitle();
+      });
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await Promise.all([loadTechnologies(), loadLevels()]);
+        updateSubtitle();
+        loadOrigins();
+        loadJobs();
+      });
+    </script>
+  </body>
+</html>
