@@ -20,7 +20,7 @@ dependencies = [
 python = "^3.12"
 
 [tool.poetry]
-packages = [{include = "src"}]
+package-mode = false
 
 
 [build-system]
